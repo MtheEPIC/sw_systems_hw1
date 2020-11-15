@@ -6,32 +6,23 @@ SLFLAGS=-lmyMath
 libmyMath.a: basicMath.o power.o
 	ar rcs libmyMath.a basicMath.o power.o 
 
-libmyMath.so: basicMath.o power.o
+libmyMath.so: 
 	$(CC) $(CFLAGS) -fPIC -c basicMath.c power.c 
 	$(CC) -shared basicMath.o power.o -o libmyMath.so
 	
 .PHONY: all
-all: main.o basicMath.o power.o libmyMath.so libmyMath.a
-	# link to main file
-	$(CC) -o maind main.o libmyMath.so
-	sudo mv libmyMath.so /usr/lib/
-	sudo ldconfig
-	# link to main file
-	$(CC) -L. main.o -lmyMath -o mains
+all: mains maind
 	
-mymaths: basicMath.o power.o
-	ar rcs libmyMath.a basicMath.o power.o
+mymaths: libmyMath.a
 	
-mymathd:
-	$(CC) $(CFLAGS) -fPIC -c basicMath.c power.c 
-	$(CC) -shared basicMath.o power.o -o libmyMath.so
+mymathd: libmyMath.so
 	
-mains: main.o
+mains: main.o libmyMath.a
 	$(CC) -L. main.o -lmyMath -o mains
 
-maind: main.o
+maind: main.o libmyMath.so
 	$(CC) -o maind main.o libmyMath.so
-	sudo mv libmyMath.so /usr/lib/
+	sudo cp libmyMath.so /usr/lib/
 	sudo ldconfig
 
 .PHONY: clean
